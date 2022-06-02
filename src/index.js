@@ -32,13 +32,19 @@ app.put("/repositories/:id", (req, res) => {
   const { id } = req.params;
   const { title, url, techs } = req.body
 
-  repositoryIndex = repositories.findindex(repository => repository.id === id);
+  const checksExistsRepository = repositories.find( repository => repository.id === id );
 
-  if (repositoryIndex < 0) return res.status(404).json({ error: "Repository not found" });
+  if (!checksExistsRepository) return res.status(404).json({ error: "Repository Not Found" });
+  
+  const repositoryIndex = repositories.indexOf(checksExistsRepository);
+
+  if (repositoryIndex === -1) return res.status(404).json({ error: "Repository not found" });
 
   const repository = repositories[repositoryIndex];
 
-  
+  if (title) { repository.title = title; }
+  if (url) { repository.url = url; }
+  if (techs) { repository.techs = techs; }
 
   repositories[repositoryIndex] = repository;
 
@@ -48,11 +54,13 @@ app.put("/repositories/:id", (req, res) => {
 app.delete("/repositories/:id", (req, res) => {
   const { id } = req.params;
 
-  repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  const checksExistsRepository = repositories.find( repository => repository.id === id );
 
-  if (repositoryIndex > 0) {
-    return res.status(404).json({ error: "Repository not found" });
-  }
+  if (!checksExistsRepository) return res.status(404).json({ error: "Repository Not Found" });
+  
+  const repositoryIndex = repositories.indexOf(checksExistsRepository);
+
+  if (repositoryIndex === -1) return res.status(404).json({ error: "Repository not found" });
 
   repositories.splice(repositoryIndex, 1);
 
@@ -62,15 +70,19 @@ app.delete("/repositories/:id", (req, res) => {
 app.post("/repositories/:id/like", (req, res) => {
   const { id } = req.params;
 
-  repositoryIndex = repositories.findIndex(repository => repository.id === id);
+  const checksExistsRepository = repositories.find( repository => repository.id === id );
 
-  if (repositoryIndex < 0) {
-    return res.status(404).json({ error: "Repository not found" });
-  }
+  if (!checksExistsRepository) return res.status(404).json({ error: "Repository Not Found" });
+  
+  const repositoryIndex = repositories.indexOf(checksExistsRepository);
 
-  const likes = ++repositories[repositoryIndex].likes;
+  if (repositoryIndex === -1) return res.status(404).json({ error: "Repository not found" });
 
-  return res.json('likes');
+  ++repositories[repositoryIndex].likes;
+
+  const repo = repositories[repositoryIndex];
+
+  return res.json(repo);
 });
 
 module.exports = app;
